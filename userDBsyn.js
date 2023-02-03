@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const sequelize = require('./dbConnector');
 
 const User = sequelize.define('User', {
@@ -15,6 +16,9 @@ const User = sequelize.define('User', {
   },
   passwort: {
     type: Sequelize.STRING
+  },
+  gesUrlaub: {
+    type: Sequelize.INTEGER
   }
 });
 
