@@ -19,7 +19,19 @@ const User = sequelize.define('User', {
   },
   gesUrlaub: {
     type: Sequelize.INTEGER
-  }
+  },
+  role: {
+    type: Sequelize.STRING
+  },
+  restUrlaub: {
+    type: Sequelize.INTEGER
+  },
+  gepUrlaubsTage: {
+    type: Sequelize.INTEGER
+  },
+  genUrlaubsTage: {
+    type: Sequelize.INTEGER
+  },
 },{
   tableName: "User"
 });
