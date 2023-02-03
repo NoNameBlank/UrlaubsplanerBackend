@@ -20,6 +20,8 @@ const User = sequelize.define('User', {
   gesUrlaub: {
     type: Sequelize.INTEGER
   }
+},{
+  tableName: "User"
 });
 
 module.exports = User;

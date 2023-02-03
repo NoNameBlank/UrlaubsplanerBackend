@@ -6,25 +6,24 @@ const app = express();
 User.sync().then(() => {
   console.log("User table created");
   //create a new user instance
-  // const newUser = User.build({
-  //   userId: 3,
-  //   vorname: 'Hans',
-  //   nachname: 'Harley',
-  //   passwort: "123",
-  //   gesUrlaub: 30,
-  //   createdAt: "",
-  //   updatedAt: ""
+  const newUser = User.build({
+    userId: 1,
+    vorname: 'Peter',
+    nachname: 'Harley',
+    passwort: "123",
+    gesUrlaub: 30
+   
 
-  // });
+  });
 
-  // //save the user to the database
-  // newUser.save()
-  //   .then(() => {
-  //     console.log('User has been saved.');
-  //   })
-  //   .catch((error) => {
-  //     console.error(error);
-  //   });
+  //save the user to the database
+  newUser.save()
+    .then(() => {
+      console.log('User has been saved.');
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   User.findAll().then(user => {
     
     console.log(user);
