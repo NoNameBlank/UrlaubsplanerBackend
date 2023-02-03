@@ -7,10 +7,10 @@ User.sync().then(() => {
   console.log("User table created");
   //create a new user instance
   // const newUser = User.build({
-  //   userId: 2,
-  //   vorname: 'Bob',
-  //   nachname: 'marley',
-  //   passwort: "54321",
+  //   userId: 3,
+  //   vorname: 'Hans',
+  //   nachname: 'Harley',
+  //   passwort: "123",
   //   gesUrlaub: 30,
   //   createdAt: "",
   //   updatedAt: ""
@@ -25,9 +25,9 @@ User.sync().then(() => {
   //   .catch((error) => {
   //     console.error(error);
   //   });
-  User.findAll().then(users => {
+  User.findAll().then(user => {
     
-    console.log(users);
+    console.log(user);
   });
 });
 
