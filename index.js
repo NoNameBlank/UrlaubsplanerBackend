@@ -1,3 +1,121 @@
+
+
+const express = require('express');
+const User = require('./userDBsyn');
+const bodyParser = require('body-parser');
+const expressMetadata = require('express-metadata');
+
+const cors = require('cors');
+
+
+const app = express();
+app.use(cors());
+
+
+// app.options('*', (req, res) => {
+//   res.set('Access-Control-Allow-Origin', '*');
+//   res.send('ok');
+// });
+
+// app.use((req, res) => {
+//   res.set('Access-Control-Allow-Origin', '*');
+// });
+
+const router = express.Router();
+
+// CORS (Cross-Origin Resource Sharing) headers to support Cross-site HTTP requests
+
+app.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
+//Metadaten erstellen
+ app.use(bodyParser.json());
+ app.use(bodyParser.urlencoded({ extended: false }));
+ 
+// app.use(expressMetadata());
+
+// Define a route
+// router.get('/api/users', (req, res) => {
+//   User.findAll().then(user => {
+
+//     console.log(user);
+//   });
+// });
+
+module.exports = router;
+
+// User.sync().then(() => {
+//   console.log("User table created");
+// //create a new user instance
+// const newUser = User.build({
+//   userId: 2,
+//   vorname: 'Susi',
+//   nachname: 'Much',
+//   passwort: "321",
+//   gesUrlaub: 30,
+//   role: "Admin",
+//   restUrlaub: 20,
+//   gepUrlaubsTage: 10,
+//   genUrlaubsTage: 3
+
+
+// });
+
+// //save the user to the database
+// newUser.save()
+//   .then(() => {
+//     console.log('User has been saved.');
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
+//   User.findAll().then(user => {
+
+//     console.log(user);
+//   });
+// });
+
+//Routen
+
+app.get('/api/users', (req, res) => {
+  User.findAll().then(user => {
+
+    console.log(user);
+    res.send(user);
+  });
+
+});
+
+app.get("/api/$metadata", (req, res) => {
+  res.type("application/xml");
+  res.sendFile(`${__dirname}/metadata.xml`);
+});
+
+
+
+
+
+
+
+
+
+
+
+app.listen(3000, () => {
+  console.log('Example app listening on port 3000!');
+});
+
+
+
+
+
+
+/* ----------------------------------- Metadata via XML erstellt
+
 const express = require("express");
 const User = require("./userDBsyn");
 const bodyParser = require("body-parser");
@@ -65,6 +183,9 @@ app.get("/api/metadata", (req, res) => {
 app.listen(3000, () => {
   console.log("Example app listening on port 8080!");
 });
+
+*/
+
 
 /* -------------------------------------------------------------------- Express-Metadata Versuch 2.      Es gibt keine Biblo?
 
