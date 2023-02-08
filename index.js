@@ -118,18 +118,18 @@ app.get('/api/userdetails', async (req, res) => {
   var userId = req.query.userId;
   var user = await User.findByPk(userId);
   if (user) {
-    res.send({
-      "userId": user.userId,
-      "vorname": user.vorname,
-      "nachname": user.nachname,
-      "passwort": user.passwort,
-      "gesUrlau": user.gesUrlau,
-      "createdAt": user.createdAt,
-      "updatedAt": user.updatedAt,
-      "role": user.role,
-     "restUrlaubsTage": user.restUrlaubsTage,
-     "gepUrlaubsTage": user.gepUrlaubsTage,
-     "genUrlaubsTage": user.genUrlaubsTage
+    res.send({user
+    //   "userId": user.userId,
+    //   "vorname": user.vorname,
+    //   "nachname": user.nachname,
+    //   "passwort": user.passwort,
+    //   "gesUrlaub": user.gesUrlaub,
+    //   "createdAt": user.createdAt,
+    //   "updatedAt": user.updatedAt,
+    //   "role": user.role,
+    //  "restUrlaubsTage": user.restUrlaubsTage,
+    //  "gepUrlaubsTage": user.gepUrlaubsTage,
+    //  "genUrlaubsTage": user.genUrlaubsTage
     
     
     });
