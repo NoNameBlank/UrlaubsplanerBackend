@@ -22,8 +22,8 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:8080");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
-  });
-
+});
+app.options("/*", function (req, res, next) { res.header('Access-Control-Allow-Origin', '*'); res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS'); res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With'); res.send(200); });
 
 // app.all('*', function(req, res, next) {
 //   res.header("Access-Control-Allow-Origin", "*");
@@ -33,9 +33,9 @@ app.use(function (req, res, next) {
 // });
 
 //Metadaten erstellen
- app.use(bodyParser.json());
- app.use(bodyParser.urlencoded({ extended: false }));
- 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 
 module.exports = router;
 
@@ -74,16 +74,36 @@ module.exports = router;
 
 app.get('/api/users', async (req, res) => {
   const user = await User.findAll();
-      
-    res.send(user);
-    console.log(user);
+
+  res.send(user);
+  console.log(user);
+});
+
+app.get('/api/login', async (req, res) => {
+  // debugger;
+  // console.log(req);
+  var username = req.query.userName;
+  var userPW = req.query.passwort;
+  var user = await User.findAll();
+  var oEntry = user.find(function (oEntry) {
+console.log(oEntry.dataValues);
+      return oEntry.dataValues.vorname === username;
   });
+  if (oEntry) {
+      if (oEntry.dataValues.passwort === userPW) {
+          
+res.send({"userId" : oEntry.dataValues.userId});
+      } else {
+          res.status(404).send('Sorry, cant find that');
+      }
 
 
+  } else {
 
-app.get("/api/$metadata", (req, res) => {
-  res.type("application/xml");
-  res.sendFile(`${__dirname}/metadata.xml`);
+    res.status(404).send('Sorry, cant find that');
+  }
+
+
 });
 
 
