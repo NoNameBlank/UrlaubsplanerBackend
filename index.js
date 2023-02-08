@@ -72,12 +72,19 @@ module.exports = router;
 
 //Routen
 
-app.get('/api/users', async (req, res) => {
-  const user = await User.findAll();
+// app.get('/api/users', async (req, res) => {
+//   const user = await User.findAll();
 
-  res.send(user);
-  console.log(user);
-});
+//   res.send(user);
+//   console.log(user);
+// });
+
+
+/*--------------------------------------------------------Login Ablgeich----------------------------------------------------------------------*/
+
+
+
+
 
 app.get('/api/login', async (req, res) => {
   // debugger;
@@ -86,16 +93,16 @@ app.get('/api/login', async (req, res) => {
   var userPW = req.query.passwort;
   var user = await User.findAll();
   var oEntry = user.find(function (oEntry) {
-console.log(oEntry.dataValues);
-      return oEntry.dataValues.vorname === username;
+    console.log(oEntry.dataValues);
+    return oEntry.dataValues.vorname === username;
   });
   if (oEntry) {
-      if (oEntry.dataValues.passwort === userPW) {
-          
-res.send({"userId" : oEntry.dataValues.userId});
-      } else {
-          res.status(404).send('Sorry, cant find that');
-      }
+    if (oEntry.dataValues.passwort === userPW) {
+
+      res.send({ "userId": oEntry.dataValues.userId });
+    } else {
+      res.status(404).send('Sorry, cant find that');
+    }
 
 
   } else {
@@ -105,9 +112,54 @@ res.send({"userId" : oEntry.dataValues.userId});
 
 
 });
+/*-----------------------------------------------------UserDaten im Dashboard Laden----------------------------------------------------------- */
+
+app.get('/api/userdetails', async (req, res) => {
+  var userId = req.query.userId;
+  var user = await User.findByPk(userId);
+  if (user) {
+    res.send({
+      "userId": user.userId,
+      "vorname": user.vorname,
+      "nachname": user.nachname,
+      "passwort": user.passwort,
+      "gesUrlau": user.gesUrlau,
+      "createdAt": user.createdAt,
+      "updatedAt": user.updatedAt,
+      "role": user.role,
+     "restUrlaubsTage": user.restUrlaubsTage,
+     "gepUrlaubsTage": user.gepUrlaubsTage,
+     "genUrlaubsTage": user.genUrlaubsTage
+    
+    
+    });
+    console.log("User der Sich eingeloggt hat: " + user.userId + user.vorname);
+    debugger;
+  } else {
+    res.status(404).send('Benutzer nicht gefunden');
+  }
+});
 
 
 
+
+
+
+
+/*
+app.get('/api/users', async (req, res) => {
+  var userId = req.query.userId;
+  var user = await User.findAll();
+  var oEntry = user.find(function(oEntry){
+    return oEntry.dataValues.userId == userId
+  })
+
+  res.send(user);
+  console.log( " Das soll der Datensatz sein, der nur die Daten der Eingeloggten ID zurück gibt: " + user);
+  debugger;
+});
+
+*/
 
 app.listen(3000, () => {
   console.log('Example app listening on port 3000!');
