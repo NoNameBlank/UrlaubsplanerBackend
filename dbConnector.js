@@ -12,4 +12,5 @@ const sequelize = new Sequelize('sqlite:./Urlaubsplaner.db',  {
  // storage: 'sqlite:./Urlaubsplaner'
 });
 
+
 module.exports = sequelize;

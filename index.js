@@ -1,9 +1,8 @@
 
-
 const express = require('express');
 const User = require('./userDBsyn');
+const Urlaub = require('./urlaubDBsyn');
 const bodyParser = require('body-parser');
-const expressMetadata = require('express-metadata');
 
 const cors = require('cors');
 
@@ -36,9 +35,33 @@ app.options("/*", function (req, res, next) { res.header('Access-Control-Allow-O
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-
+// Urlaub.belongsTo(User);
 module.exports = router;
+// User.sync().then(() => {
+//   Urlaub.sync().then(() => {
+//     const newUrlaub = Urlaub.build({
+//       urlaubId: 2,
+//       userId: 2,
+//       startDatum: "03.03.2023",
+//       endDatum: "05.03.2023",
+//       titel: "Urlaub"
+//     });
 
+//     //save the user to the database
+//     newUrlaub.save()
+//         .then(() => {
+//       console.log('User has been saved.');
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+//     Urlaub.findAll().then(object => {
+
+//       console.log(object);
+
+//     });
+//   });
+// });
 // User.sync().then(() => {
 //   console.log("User table created");
 // //create a new user instance
@@ -117,24 +140,21 @@ app.get('/api/login', async (req, res) => {
 app.get('/api/userdetails', async (req, res) => {
   var userId = req.query.userId;
   var user = await User.findByPk(userId);
+  user.dataValues.appointments = [];
+  var urlaub = await Urlaub.findAll({where : {userId : userId}});
   if (user) {
-    res.send({user
-    //   "userId": user.userId,
-    //   "vorname": user.vorname,
-    //   "nachname": user.nachname,
-    //   "passwort": user.passwort,
-    //   "gesUrlaub": user.gesUrlaub,
-    //   "createdAt": user.createdAt,
-    //   "updatedAt": user.updatedAt,
-    //   "role": user.role,
-    //  "restUrlaubsTage": user.restUrlaubsTage,
-    //  "gepUrlaubsTage": user.gepUrlaubsTage,
-    //  "genUrlaubsTage": user.genUrlaubsTage
-    
-    
+    urlaub.forEach(element => {
+      delete element.dataValues.createdAt;
+      delete element.dataValues.updatedAt;
+      // console.log(element.dataValues);
+      user.dataValues.appointments.push(element.dataValues);
     });
-    console.log("User der Sich eingeloggt hat: " + user.userId + user.vorname);
-    debugger;
+    
+    var data = user.dataValues;
+    delete data.passwort;
+    console.log(data);
+    res.send({data});
+    console.log("User der Sich eingeloggt hat: " + user.userId + user.vorname + "Resturlaub: " +  user.restUrlaub);
   } else {
     res.status(404).send('Benutzer nicht gefunden');
   }
