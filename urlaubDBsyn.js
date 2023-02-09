@@ -27,7 +27,10 @@ const Urlaub = sequelize.define('Urlaub', {
   },
   titel: {
     type: Sequelize.STRING
-  }
+  },
+  status: {
+    type: Sequelize.STRING
+  },
 },{
   tableName: "Urlaub"
 });

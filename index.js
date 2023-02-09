@@ -5,23 +5,21 @@ const Urlaub = require('./urlaubDBsyn');
 const bodyParser = require('body-parser');
 
 const cors = require('cors');
-
+const corsOptions = {
+  origin: 'http://localhost:8080',
+  optionsSuccessStatus: 200
+};
 
 const app = express();
-app.use(cors());
+app.use(cors(corsOptions));
 
-//app.use(express.static(__dirname));
-
-
-const router = express.Router();
-
-// CORS (Cross-Origin Resource Sharing) headers to support Cross-site HTTP requests
-
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:8080"); 
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+const router = express.Router();
+
 app.options("/*", function (req, res, next) { res.header('Access-Control-Allow-Origin', '*'); res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS'); res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With'); res.send(200); });
 
 // app.all('*', function(req, res, next) {
@@ -147,6 +145,8 @@ app.get('/api/userdetails', async (req, res) => {
       delete element.dataValues.createdAt;
       delete element.dataValues.updatedAt;
       // console.log(element.dataValues);
+      // element.dataValues.endDatum = new Date(element.dataValues.endDatum);
+      // element.dataValues.startDatum = new Date(element.dataValues.endDatum);
       user.dataValues.appointments.push(element.dataValues);
     });
     
@@ -161,9 +161,30 @@ app.get('/api/userdetails', async (req, res) => {
 });
 
 
+// app.set('/api/urlaub', async (req, res) => {
+//   var data = req.query;
+  
+// });
 
-
-
+app.post('/api/urlaub', async (req, res) => {
+  var data = req.body;
+  console.log(data);
+  var newUrlaub = Urlaub.build({
+    userId : data.oAppointment.userId,
+    startDatum : data.oAppointment.start,
+    endDatum : data.oAppointment.end,
+    titel : data.oAppointment.title,
+    status : data.oAppointment.status
+    })
+    newUrlaub.save().then(() => {
+      console.log('Urlaub wurde gespeichert.');
+      res.send();
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send({error});
+    });
+});
 
 
 /*
