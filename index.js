@@ -165,16 +165,16 @@ app.get('/api/userdetails', async (req, res) => {
 //   var data = req.query;
   
 // });
-
+/*------------------------------------------------------------Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben */
 app.post('/api/urlaub', async (req, res) => {
   var data = req.body;
   console.log(data);
   var newUrlaub = Urlaub.build({
-    userId : data.oAppointment.userId,
-    startDatum : data.oAppointment.start,
-    endDatum : data.oAppointment.end,
-    titel : data.oAppointment.title,
-    status : data.oAppointment.status
+    userId : data['oAppointment[userId]'],
+    startDatum : data['oAppointment[start]'],
+    endDatum : data['oAppointment[end]'],
+    titel : data['oAppointment[title]'],
+    status : data['oAppointment[status]']
     })
     newUrlaub.save().then(() => {
       console.log('Urlaub wurde gespeichert.');
