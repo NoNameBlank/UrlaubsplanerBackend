@@ -3,6 +3,7 @@ const express = require('express');
 const User = require('./userDBsyn');
 const Urlaub = require('./urlaubDBsyn');
 const bodyParser = require('body-parser');
+const routes = require('./routes/allRoutes.js');
 
 const cors = require('cors');
 const corsOptions = {
@@ -106,7 +107,7 @@ module.exports = router;
 
 
 
-
+/*
 app.get('/api/login', async (req, res) => {
   // debugger;
   // console.log(req);
@@ -133,8 +134,17 @@ app.get('/api/login', async (req, res) => {
 
 
 });
+
+*/
+
+
+
 /*-----------------------------------------------------UserDaten im Dashboard Laden----------------------------------------------------------- */
 
+
+app.use('/', routes);
+
+/*
 app.get('/api/userdetails', async (req, res) => {
   var userId = req.query.userId;
   var user = await User.findByPk(userId);
@@ -159,7 +169,7 @@ app.get('/api/userdetails', async (req, res) => {
     res.status(404).send('Benutzer nicht gefunden');
   }
 });
-
+*/
 
 // app.set('/api/urlaub', async (req, res) => {
 //   var data = req.query;
