@@ -44,4 +44,26 @@ router.get('/api/userdetails', async (req, res) => {
   }
 });
 
+/*------------------------------------------------------------Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben */
+
+router.post('/api/urlaub', async (req, res) => {
+  var data = req.body;
+  console.log(data);
+  var newUrlaub = Urlaub.build({
+    userId : data['oAppointment[userId]'],
+    startDatum : data['oAppointment[start]'],
+    endDatum : data['oAppointment[end]'],
+    titel : data['oAppointment[title]'],
+    status : data['oAppointment[status]']
+    })
+    newUrlaub.save().then(() => {
+      console.log('Urlaub wurde gespeichert.');
+      res.send();
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send({error});
+    });
+});
+
 module.exports = router;

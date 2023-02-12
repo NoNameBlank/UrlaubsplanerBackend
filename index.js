@@ -176,6 +176,10 @@ app.get('/api/userdetails', async (req, res) => {
   
 // });
 /*------------------------------------------------------------Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben */
+
+
+
+/*
 app.post('/api/urlaub', async (req, res) => {
   var data = req.body;
   console.log(data);
@@ -195,7 +199,7 @@ app.post('/api/urlaub', async (req, res) => {
       res.send({error});
     });
 });
-
+*/
 
 /*
 app.get('/api/users', async (req, res) => {
@@ -215,7 +219,6 @@ app.get('/api/users', async (req, res) => {
 app.listen(3000, () => {
   console.log('Example app listening on port 3000!');
 });
-
 
 
 
