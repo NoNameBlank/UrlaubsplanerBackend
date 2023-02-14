@@ -14,8 +14,8 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:8080"); 
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:8080");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
@@ -26,6 +26,15 @@ app.options("/*", function (req, res, next) { res.header('Access-Control-Allow-O
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+
+
+
+
+
+
+
+
 
 // Urlaub.belongsTo(User);
 module.exports = router;
@@ -54,42 +63,17 @@ module.exports = router;
 //     });
 //   });
 // });
-// User.sync().then(() => {
-//   console.log("User table created");
-// //create a new user instance
-// const newUser = User.build({
-//   userId: 2,
-//   vorname: 'Susi',
-//   nachname: 'Much',
-//   passwort: "321",
-//   gesUrlaub: 30,
-//   role: "Admin",
-//   restUrlaub: 20,
-//   gepUrlaubsTage: 10,
-//   genUrlaubsTage: 3
 
-
-// });
-
-// //save the user to the database
-// newUser.save()
-//   .then(() => {
-//     console.log('User has been saved.');
-//   })
-//   .catch((error) => {
-//     console.error(error);
-//   });
-//   User.findAll().then(user => {
-
-//     console.log(user);
-//   });
-// });
 
 
 
 
 //Routen in routes ausgelagert
 app.use('/', routes);
+
+
+
+
 
 
 
