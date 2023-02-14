@@ -32,7 +32,7 @@ const User = sequelize.define('User', {
   genUrlaubsTage: {
     type: Sequelize.INTEGER
   },
-  teamId: {
+  teamLeiterId: {
     type: Sequelize.INTEGER
   }
 },{

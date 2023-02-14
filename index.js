@@ -23,14 +23,7 @@ const router = express.Router();
 
 app.options("/*", function (req, res, next) { res.header('Access-Control-Allow-Origin', '*'); res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS'); res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With'); res.send(200); });
 
-// app.all('*', function(req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-//   res.header('Access-Control-Allow-Headers', 'Content-Type');
-//   next();
-// });
 
-//Metadaten erstellen
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -92,114 +85,21 @@ module.exports = router;
 //   });
 // });
 
-//Routen
-
-// app.get('/api/users', async (req, res) => {
-//   const user = await User.findAll();
-
-//   res.send(user);
-//   console.log(user);
-// });
-
-
-/*--------------------------------------------------------Login Ablgeich----------------------------------------------------------------------*/
 
 
 
-
-/*
-app.get('/api/login', async (req, res) => {
-  // debugger;
-  // console.log(req);
-  var username = req.query.userName;
-  var userPW = req.query.passwort;
-  var user = await User.findAll();
-  var oEntry = user.find(function (oEntry) {
-    console.log(oEntry.dataValues);
-    return oEntry.dataValues.vorname === username;
-  });
-  if (oEntry) {
-    if (oEntry.dataValues.passwort === userPW) {
-
-      res.send({ "userId": oEntry.dataValues.userId });
-    } else {
-      res.status(404).send('Sorry, cant find that');
-    }
-
-
-  } else {
-
-    res.status(404).send('Sorry, cant find that');
-  }
-
-
-});
-
-*/
-
-
-
-/*-----------------------------------------------------UserDaten im Dashboard Laden----------------------------------------------------------- */
-
-
+//Routen in routes ausgelagert
 app.use('/', routes);
 
-/*
-app.get('/api/userdetails', async (req, res) => {
-  var userId = req.query.userId;
-  var user = await User.findByPk(userId);
-  user.dataValues.appointments = [];
-  var urlaub = await Urlaub.findAll({where : {userId : userId}});
-  if (user) {
-    urlaub.forEach(element => {
-      delete element.dataValues.createdAt;
-      delete element.dataValues.updatedAt;
-      // console.log(element.dataValues);
-      // element.dataValues.endDatum = new Date(element.dataValues.endDatum);
-      // element.dataValues.startDatum = new Date(element.dataValues.endDatum);
-      user.dataValues.appointments.push(element.dataValues);
-    });
-    
-    var data = user.dataValues;
-    delete data.passwort;
-    console.log(data);
-    res.send({data});
-    console.log("User der Sich eingeloggt hat: " + user.userId + user.vorname + "Resturlaub: " +  user.restUrlaub);
-  } else {
-    res.status(404).send('Benutzer nicht gefunden');
-  }
-});
-*/
 
-// app.set('/api/urlaub', async (req, res) => {
-//   var data = req.query;
-  
-// });
+
+
+
 /*------------------------------------------------------------Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben */
 
 
 
-/*
-app.post('/api/urlaub', async (req, res) => {
-  var data = req.body;
-  console.log(data);
-  var newUrlaub = Urlaub.build({
-    userId : data['oAppointment[userId]'],
-    startDatum : data['oAppointment[start]'],
-    endDatum : data['oAppointment[end]'],
-    titel : data['oAppointment[title]'],
-    status : data['oAppointment[status]']
-    })
-    newUrlaub.save().then(() => {
-      console.log('Urlaub wurde gespeichert.');
-      res.send();
-    })
-    .catch((error) => {
-      console.error(error);
-      res.send({error});
-    });
-});
-*/
+
 
 /*
 app.get('/api/users', async (req, res) => {

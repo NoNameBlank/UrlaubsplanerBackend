@@ -3,9 +3,16 @@ const Urlaub = require('../urlaubDBsyn');
 const express = require('express');
 const router = express.Router();
 
-/*--------------------------------------------------------Login Ablgeich----------------------------------------------------------------------*/
 
-router.get('/api/login', async (req, res) => {
+
+
+
+/* -------------------------------------------------------------------API/USERDETAIL------------------------------------------------------------------------------------*/
+
+
+
+/*---Login Ablgeich---*/
+router.get('/api/userDetail', async (req, res) => {
   var username = req.query.userName;
   var userPW = req.query.passwort;
   var user = await User.findAll();
@@ -23,9 +30,13 @@ router.get('/api/login', async (req, res) => {
   }
 });
 
-/*-----------------------------------------------------UserDaten im Dashboard Laden----------------------------------------------------------- */
+/* -------------------------------------------------------------------API/USERBYID------------------------------------------------------------------------------------*/
 
-router.get('/api/userdetails', async (req, res) => {
+
+
+
+/*---UserDaten im Dashboard Laden--- */
+router.get('/api/userById', async (req, res) => {
   var userId = req.query.userId;
   var user = await User.findByPk(userId);
   user.dataValues.appointments = [];
@@ -44,8 +55,13 @@ router.get('/api/userdetails', async (req, res) => {
   }
 });
 
-/*------------------------------------------------------------Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben */
 
+/* -------------------------------------------------------------------API/URLAUB------------------------------------------------------------------------------------*/
+
+
+
+
+/*---Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben--- */
 router.post('/api/urlaub', async (req, res) => {
   var data = req.body;
   console.log(data);
@@ -57,16 +73,16 @@ router.post('/api/urlaub', async (req, res) => {
     status : data['oAppointment[status]']
     })
     newUrlaub.save().then(() => {
-      console.log('Urlaub wurde gespeichert.');
+      // console.log('Urlaub wurde gespeichert.');
       res.send();
     })
     .catch((error) => {
-      console.error(error);
+      // console.error(error);
       res.send({error});
     });
 });
 
-
+/*---Ulaub Löschen--- */
 router.delete('/api/urlaub', (req, res) => {
   var data = req.body;
   if(data){
@@ -77,6 +93,7 @@ router.delete('/api/urlaub', (req, res) => {
   }
 });
 
+/*---GET Urlaub anhand der UserId--- */
 router.get('/api/urlaub', async (req, res) => {
   var data = await Urlaub.findAll({where : {userId : userId}});
   if(data){
@@ -86,6 +103,23 @@ router.get('/api/urlaub', async (req, res) => {
   }
  
 });
+/* -------------------------------------------------------------------API/User------------------------------------------------------------------------------------*/
+
+
+/*---GET Alle User aus DB--- */
+router.get('/api/user', async (req, res) => {
+  var users  = await User.findAll();
+  if(users){
+    res.send({users});
+    console.log("Hier drünter müssten allllle User stehen");
+    console.log(users);
+  }
+});
+
+
+
+
+
 
 
 module.exports = router;
