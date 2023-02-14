@@ -31,6 +31,9 @@ const User = sequelize.define('User', {
   },
   genUrlaubsTage: {
     type: Sequelize.INTEGER
+  },
+  teamId: {
+    type: Sequelize.INTEGER
   }
 },{
   tableName: "User"
