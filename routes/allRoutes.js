@@ -84,16 +84,26 @@ router.post('/api/urlaub', async (req, res) => {
 });
 
 //Fehler Handling!!!!
-//Funktioniert nicht
+//Funktioniert nicht--------------------------------------------------------------------------------------------SOOOOLLLLLLLLLLLLLLTTTEEEEEEEEEEE klappen^^
 
 /*---Ulaub Löschen--- */
-router.delete('/api/urlaub', (req, res) => {
-  var urlaubId = req.body.urlaubId;
-  if (urlaubId) {
-    Urlaub.destroy({
-      where: { urlaubId: urlaubId }
-    })
-    res.send("DELETE Request Called")
+router.delete('/api/urlaub', async (req, res)=> {
+const { urlaubId, userId } = req.body;
+  if (!urlaubId || !userId) {
+    return res.status(400).send("Es wurde keine urlaubId oder userId übergeben.");
+  }
+  
+  try {
+    const affectedRows = await Urlaub.update({ userId: null }, { where: { urlaubId } });
+    if (affectedRows > 0) {
+      await Urlaub.destroy({ where: { userId } });
+      res.send(`Urlaub mit urlaubId ${urlaubId} wurde gelöscht.`);
+    } else {
+      res.status(404).send(`Es wurde kein Urlaub mit urlaubId ${urlaubId} gefunden.`);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Ein Fehler ist aufgetreten.");
   }
 });
 
@@ -163,7 +173,7 @@ router.post('/api/user', async (req, res) => {
 
 /*---Update User in DB--- */
 router.put('/api/user', async (req, res) => {
-   
+
   User.update({
     vorname: req.body.vorname,
     nachname: req.body.nachname,
@@ -175,7 +185,7 @@ router.put('/api/user', async (req, res) => {
     genUrlaubsTage: req.body.genUrlaubsTage,
     teamLeiterId: req.body.teamLeiterId
   },
-    { where: { userId: req.body.userId} }
+    { where: { userId: req.body.userId } }
   ).then(() => {
     console.log("User aktualisiert");
     res.send();
@@ -207,13 +217,13 @@ router.get('/api/teamUrlaub', async (req, res) => {
   var data = [];
 
 
-  console.log("Anfrage auf TeamleiterID: "+teamLeiterId);
+  console.log("Anfrage auf TeamleiterID: " + teamLeiterId);
   // JOIN-Abfrage, um alle Benutzer und Urlaube zu finden, die mit der übergebenen "teamLeiterId" verknüpft sind
   const userArray = await User.findAll({
-    where: { teamLeiterId: teamLeiterId } ,
-  
+    where: { teamLeiterId: teamLeiterId },
+
   });
- 
+
 
   userArray.forEach(user => {
     userIdArray.push(user.dataValues.userId);
@@ -230,7 +240,7 @@ router.get('/api/teamUrlaub', async (req, res) => {
   } else {
     res.send("Fehler beim Laden der Urlaubsdaten");
   }
-  
+
 });
 
 
@@ -241,23 +251,153 @@ router.get('/api/userTeam', async (req, res) => {
   var data = [];
 
 
-console.log("Anfrage auf TeamleiterID: "+teamLeiterId);
-// JOIN-Abfrage, um alle Benutzer und Urlaube zu finden, die mit der übergebenen "teamLeiterId" verknüpft sind
-const userArray = await User.findAll({
-  where: { teamLeiterId: teamLeiterId } ,
+  console.log("Anfrage auf TeamleiterID: " + teamLeiterId);
+  const userArray = await User.findAll({
+    where: { teamLeiterId: teamLeiterId },
 
-});
+  });
 
 
-userArray.forEach(user => {
-  data.push(user.dataValues);
-  console.log("Die namen der User aus deinem Team: " );
+  userArray.forEach(user => {
+    data.push(user.dataValues);
+    console.log("Die namen der User aus deinem Team: ");
+    console.log(data);
+  })
+  res.send(data);
   console.log(data);
-})
-res.send(data);
-console.log(data);
 });
 
+/*---Create Team in DB--- */
+router.post('/api/userTeam', async (req, res) => {
+  Team.sync().then(() => {
+    const newTeam = Team.build({
+      teamLeiterId: req.body.teamLeiterId,
+      teamName: req.body.teamName
+
+    })
+    newTeam.save()
+      .then(() => {
+        console.log('Team wurde gespeichert.');
+
+      })
+      .catch((error) => {
+       // console.error(error);
+        res.send({ error });
+      });
+
+
+    Team.findAll().then(team => {
+
+      //console.log(team);
+      res.send({ team });
+    });
+  });
+});
+
+/*---Team Löschen--- */
+router.delete('/api/userTeam', async (req, res) => {
+  
+  
+  
+  Team.findAll({
+    where: {
+      teamLeiterId: 1 // oder andere ID
+    }
+  }).then(teams => {
+    console.log(teams);
+  });
+ 
+ 
+ 
+  const { teamLeiterId } = req.body;
+  if (!teamLeiterId) {
+    return res.status(400).send("Es wurde keine teamLeiterId übergeben.");
+  }
+  
+  try {
+    const affectedRows = await User.update({ teamLeiterId: null }, { where: { teamLeiterId } });
+    if (affectedRows > 0) {
+      await Team.destroy({ where: { teamLeiterId } });
+      res.send(`Team mit teamLeiterId ${teamLeiterId} wurde gelöscht.`);
+    } else {
+      res.status(404).send(`Es wurde kein Team mit teamLeiterId ${teamLeiterId} gefunden.`);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Ein Fehler ist aufgetreten.");
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// router.delete('/api/team', async (req, res) => {
+//   try {
+//     const { teamLeiterId } = req.body;
+
+//     // Find all users who reference this team as their team leader
+//     const users = await User.findAll({ where: { teamLeiterId: teamLeiterId } });
+
+//     // Set teamLeiterId to null for all users that reference this team
+//     await Promise.all(
+//       users.map(async (user) => {
+//         user.teamLeiterId = null;
+//         await user.save();
+//       })
+//     );
+
+//     // Delete the team
+//     await Team.destroy({ where: { teamLeiterId } });
+
+//     res.send(`Team mit der ID ${teamLeiterId} wurde erfolgreich gelöscht.`);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Ein Fehler ist aufgetreten. Das Team konnte nicht gelöscht werden.');
+//   }
+// });
+
+
+
+/*---FEhler Ursache Löschen--- 
+router.delete('/api/userTeam', async (req, res) => {
+  try {
+    const teamId = req.body.teamId;
+
+    // Prüfen, ob es Datensätze in der "User"-Tabelle gibt, die auf das zu löschende Team verweisen
+    const users = await User.findAll({
+      where: { teamId: teamId }
+    });
+
+    if (users.length > 0) {
+      // Wenn es Datensätze gibt, die auf das zu löschende Team verweisen, diese Datensätze löschen
+      await User.destroy({
+        where: { teamId: teamId }
+      });
+    }
+
+    // Das Team löschen
+    await Team.destroy({
+      where: { teamId: teamId }
+    });
+
+    res.send("Team wurde gelöscht.");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Fehler beim Löschen des Teams.");
+  }
+});
+*/
 
 
 module.exports = router;

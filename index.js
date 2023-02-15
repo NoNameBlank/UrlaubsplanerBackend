@@ -4,7 +4,7 @@ const User = require('./userDBsyn');
 const Urlaub = require('./urlaubDBsyn');
 const bodyParser = require('body-parser');
 const routes = require('./routes/allRoutes.js');
-
+const Team = require('./teamDBsyn');
 const cors = require('cors');
 const corsOptions = {
   origin: 'http://localhost:8080',
@@ -68,6 +68,37 @@ module.exports = router;
 
 //Routen in routes ausgelagert
 app.use('/', routes);
+
+// Team.sync().then(() => {
+//   const newTeam = Team.build({
+  
+//     teamLeiterId: 2,
+//     teamName: "Warum"
+
+//   })
+//   debugger;
+//   newTeam.save()
+//     .then(() => {
+//       console.log('Team wurde gespeichert.');
+
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//       res.send({ error });
+//     });
+
+
+//   Team.findAll().then(team => {
+
+//     console.log(team);
+//     debugger;
+//   });
+// });
+
+
+
+
+
 
 
 

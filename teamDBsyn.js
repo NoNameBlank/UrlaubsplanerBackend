@@ -37,6 +37,10 @@ const Team = sequelize.define('Team', {
     //   model: 'User',
     //   key: 'userId'
     // }
+  },
+  teamName: {
+    type: Sequelize.INTEGER,
+   
   }
 },{
   tableName: "Team"

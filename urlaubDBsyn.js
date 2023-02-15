@@ -11,6 +11,7 @@ const Urlaub = sequelize.define('Urlaub', {
   },
   userId: {
     type: Sequelize.INTEGER,
+    allowNull: true,
     references: {
         // This is a reference to another model
         model: User,
