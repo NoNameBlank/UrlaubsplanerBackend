@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./dbConnector');
 
+
 const User = sequelize.define('User', {
   userId: {
     type: Sequelize.INTEGER,
@@ -33,10 +34,12 @@ const User = sequelize.define('User', {
     type: Sequelize.INTEGER
   },
   teamLeiterId: {
-    type: Sequelize.INTEGER
+    type: Sequelize.INTEGER,
+   
   }
 },{
   tableName: "User"
 });
 
 module.exports = User;
+

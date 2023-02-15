@@ -34,8 +34,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 
 
-
-
 // Urlaub.belongsTo(User);
 module.exports = router;
 // User.sync().then(() => {

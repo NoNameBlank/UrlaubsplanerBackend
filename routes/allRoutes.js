@@ -1,6 +1,6 @@
 const User = require('../userDBsyn');
 const Urlaub = require('../urlaubDBsyn');
-const Team = requeire('../TeamDBsyn');
+const Team = require('../teamDBsyn');
 const express = require('express');
 const router = express.Router();
 
@@ -34,7 +34,7 @@ router.get('/api/userDetail', async (req, res) => {
 /* -------------------------------------------------------------------API/USERBYID------------------------------------------------------------------------------------*/
 
 
-
+//Fehler Handling!!!!
 
 /*---UserDaten im Dashboard Laden--- */
 router.get('/api/userById', async (req, res) => {
@@ -60,7 +60,7 @@ router.get('/api/userById', async (req, res) => {
 /* -------------------------------------------------------------------API/URLAUB------------------------------------------------------------------------------------*/
 
 
-
+//Fehler Handling!!!!
 
 /*---Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben--- */
 router.post('/api/urlaub', async (req, res) => {
@@ -83,16 +83,20 @@ router.post('/api/urlaub', async (req, res) => {
     });
 });
 
+//Fehler Handling!!!!
+//Funktioniert nicht
+
 /*---Ulaub Löschen--- */
 router.delete('/api/urlaub', (req, res) => {
-  var data = req.body;
-  if (data) {
+  var urlaubId = req.body.urlaubId;
+  if (urlaubId) {
     Urlaub.destroy({
-      where: { urlaubId: data['oAppointment[urlaubId]'] }
+      where: { urlaubId: urlaubId }
     })
     res.send("DELETE Request Called")
   }
 });
+
 
 /*---GET Urlaub anhand der UserId--- */
 router.get('/api/urlaub', async (req, res) => {
@@ -113,7 +117,7 @@ router.get('/api/user', async (req, res) => {
   var users = await User.findAll();
   if (users) {
     res.send({ users });
-    console.log("Hier drünter müssten allllle User stehen");
+    console.log("Hier drünter müssten alle User stehen");
     console.log(users);
   }
 });
@@ -142,23 +146,25 @@ router.post('/api/user', async (req, res) => {
       })
       .catch((error) => {
         console.error(error);
-
+        res.send({ error });
       });
 
 
     User.findAll().then(user => {
 
       console.log(user);
-
+      res.send({ user });
     });
   });
 });
+
+
+// Funktioniert nicht
 
 /*---Update User in DB--- */
 router.put('/api/user', async (req, res) => {
    
   User.update({
-    userId: req.body.userId,
     vorname: req.body.vorname,
     nachname: req.body.nachname,
     passwort: req.body.passwort,
@@ -180,6 +186,7 @@ router.put('/api/user', async (req, res) => {
     });
 });
 
+//Error mit mismatch auf Team
 
 /*---Mitarbeiter Löschen--- */
 router.delete('/api/user', (req, res) => {
@@ -194,11 +201,62 @@ router.delete('/api/user', (req, res) => {
 
 /* -------------------------------------------------------------------API/TEAMURLAUB------------------------------------------------------------------------------------*/
 
+router.get('/api/teamUrlaub', async (req, res) => {
+  var teamLeiterId = req.body.teamLeiterId;
+  var userIdArray = [];
+  var data = [];
+
+
+  console.log("Anfrage auf TeamleiterID: "+teamLeiterId);
+  // JOIN-Abfrage, um alle Benutzer und Urlaube zu finden, die mit der übergebenen "teamLeiterId" verknüpft sind
+  const userArray = await User.findAll({
+    where: { teamLeiterId: teamLeiterId } ,
+  
+  });
+ 
+
+  userArray.forEach(user => {
+    userIdArray.push(user.dataValues.userId);
+  })
+
+  var urlaubsArray = await Urlaub.findAll({ where: { userId: userIdArray } });
+
+  if (urlaubsArray) {
+    urlaubsArray.forEach(urlaub => {
+      console.log(urlaub.dataValues);
+      data.push(urlaub.dataValues);
+    });
+    res.send(data);
+  } else {
+    res.send("Fehler beim Laden der Urlaubsdaten");
+  }
+  
+});
+
 
 /* -------------------------------------------------------------------API/USERTEAM------------------------------------------------------------------------------------*/
+router.get('/api/userTeam', async (req, res) => {
+  var teamLeiterId = req.body.teamLeiterId;
+  var nameArray = [];
+  var data = [];
 
 
+console.log("Anfrage auf TeamleiterID: "+teamLeiterId);
+// JOIN-Abfrage, um alle Benutzer und Urlaube zu finden, die mit der übergebenen "teamLeiterId" verknüpft sind
+const userArray = await User.findAll({
+  where: { teamLeiterId: teamLeiterId } ,
 
+});
+
+
+userArray.forEach(user => {
+  data.push(user.dataValues);
+  console.log("Die namen der User aus deinem Team: " );
+  console.log(data);
+})
+res.send(data);
+console.log(data);
+});
 
 
 
