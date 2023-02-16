@@ -152,16 +152,15 @@ router.get('/api/user', async (req, res) => {
 router.post('/api/user', async (req, res) => {
   User.sync().then(() => {
     const newUser = User.build({
-      userId: 5,
-      vorname: "Donald",
-      nachname: "Duck",
-      passwort: "333",
-      gesUrlaub: 300,
-      role: "Teamleiter",
-      restUrlaub: 250,
-      gepUrlaubsTage: 50,
-      genUrlaubsTage: 49,
-      teamLeiterId: 2
+    vorname: req.body.vorname,
+    nachname: req.body.nachname,
+    passwort: req.body.passwort,
+    gesUrlaub: req.body.gesUrlaub,
+    role: req.body.role,
+    restUrlaub: req.body.restUrlaub,
+    gepUrlaubsTage: req.body.gepUrlaubsTage,
+    genUrlaubsTage: req.body.genUrlaubsTage,
+    teamId: req.body.teamId
 
     })
     newUser.save()
@@ -174,7 +173,7 @@ router.post('/api/user', async (req, res) => {
         res.send({ error });
       });
 
-
+    //Zur Kontrolle
     User.findAll().then(user => {
 
       console.log(user);
@@ -233,26 +232,19 @@ router.delete('/api/user', (req, res) => {
 
 /* -------------------------------------------------------------------API/TEAMURLAUB------------------------------------------------------------------------------------*/
 
-router.get('/api/teamUrlaub', async (req, res) => {
+router.get('/api/urlaubTeam', async (req, res) => {
   var teamLeiterId = req.body.teamLeiterId;
   var userIdArray = [];
   var data = [];
-
-
   console.log("Anfrage auf TeamleiterID: " + teamLeiterId);
   // JOIN-Abfrage, um alle Benutzer und Urlaube zu finden, die mit der übergebenen "teamLeiterId" verknüpft sind
   const userArray = await User.findAll({
     where: { teamLeiterId: teamLeiterId },
-
   });
-
-
   userArray.forEach(user => {
     userIdArray.push(user.dataValues.userId);
   })
-
   var urlaubsArray = await Urlaub.findAll({ where: { userId: userIdArray } });
-
   if (urlaubsArray) {
     urlaubsArray.forEach(urlaub => {
       console.log(urlaub.dataValues);
@@ -272,7 +264,7 @@ router.get('/api/userTeam', async (req, res) => {
   var nameArray = [];
   var data = [];
 
-
+//Die Erweitern siehe ToDO liste
   console.log("Anfrage auf TeamleiterID: " + teamLeiterId);
   const userArray = await User.findAll({
     where: { teamLeiterId: teamLeiterId },
@@ -290,7 +282,7 @@ router.get('/api/userTeam', async (req, res) => {
 });
 
 /*---Create Team in DB--- */
-router.post('/api/userTeam', async (req, res) => {
+router.post('/api/Team', async (req, res) => {
   Team.sync().then(() => {
     const newTeam = Team.build({
       teamLeiterId: req.body.teamLeiterId,
@@ -317,7 +309,7 @@ router.post('/api/userTeam', async (req, res) => {
 });
 
 /*---Team Löschen--- */
-router.delete('/api/userTeam', async (req, res) => {
+router.delete('/api/Team', async (req, res) => {
   /*
   Team.findAll({
     where: {
