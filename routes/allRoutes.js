@@ -34,33 +34,46 @@ router.get('/api/userDetail', async (req, res) => {
 /* -------------------------------------------------------------------API/USERBYID------------------------------------------------------------------------------------*/
 
 
-//Fehler Handling!!!!
+//Fehler Handling!!!!--------------------------------> sollte Behoben sein
 
 /*---UserDaten im Dashboard Laden--- */
 router.get('/api/userById', async (req, res) => {
-  var userId = req.query.userId;
-  var user = await User.findByPk(userId);
-  user.dataValues.appointments = [];
-  var urlaub = await Urlaub.findAll({ where: { userId: userId } });
-  if (user) {
-    urlaub.forEach(element => {
-      delete element.dataValues.createdAt;
-      delete element.dataValues.updatedAt;
-      user.dataValues.appointments.push(element.dataValues);
-    });
-    var data = user.dataValues;
-    delete data.passwort;
-    res.send({ data });
-  } else {
-    res.status(404).send('Benutzer nicht gefunden');
+  try {
+    var userId = req.body.userId;
+    console.log("Hier drunter sollte die ID stehebn:")
+    console.log(userId);
+    var user = await User.findByPk(userId);
+    if (!userId) {
+      res.status(404).send('Benutzer nicht gefunden');
+      return;
+    }
+    user.dataValues.appointments = [];
+    var urlaub = await Urlaub.findAll({ where: { userId: userId } });
+    if (urlaub) {
+
+      if (user) {
+        urlaub.forEach(element => {
+          delete element.dataValues.createdAt;
+          delete element.dataValues.updatedAt;
+          user.dataValues.appointments.push(element.dataValues);
+        });
+        var data = user.dataValues;
+        delete data.passwort;
+        res.send({ data });
+      }
+    } else {
+      res.status(404).send('Benutzer hat keinen Urlaub');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('User existiert nicht');
   }
 });
-
 
 /* -------------------------------------------------------------------API/URLAUB------------------------------------------------------------------------------------*/
 
 
-//Fehler Handling!!!!
+//Fehler Handling!!!!------------------Sollte gehen.
 
 /*---Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben--- */
 router.post('/api/urlaub', async (req, res) => {
@@ -72,14 +85,16 @@ router.post('/api/urlaub', async (req, res) => {
     endDatum: data['oAppointment[end]'],
     titel: data['oAppointment[title]'],
     status: data['oAppointment[status]']
-  })
-  newUrlaub.save().then(() => {
-    // console.log('Urlaub wurde gespeichert.');
-    res.send();
-  })
+  });
+
+  newUrlaub.save()
+    .then(() => {
+      // console.log('Urlaub wurde gespeichert.');
+      res.send();
+    })
     .catch((error) => {
       // console.error(error);
-      res.send({ error });
+      res.status(500).send({ error: "Es ist ein Fehler aufgetreten." });
     });
 });
 
@@ -87,12 +102,12 @@ router.post('/api/urlaub', async (req, res) => {
 //Funktioniert nicht--------------------------------------------------------------------------------------------SOOOOLLLLLLLLLLLLLLTTTEEEEEEEEEEE klappen^^
 
 /*---Ulaub Löschen--- */
-router.delete('/api/urlaub', async (req, res)=> {
-const { urlaubId, userId } = req.body;
+router.delete('/api/urlaub', async (req, res) => {
+  const { urlaubId, userId } = req.body;
   if (!urlaubId || !userId) {
     return res.status(400).send("Es wurde keine urlaubId oder userId übergeben.");
   }
-  
+
   try {
     const affectedRows = await Urlaub.update({ userId: null }, { where: { urlaubId } });
     if (affectedRows > 0) {
@@ -169,11 +184,18 @@ router.post('/api/user', async (req, res) => {
 });
 
 
-// Funktioniert nicht
+// Funktioniert nicht-------------------------------sollte Funktionieren
 
 /*---Update User in DB--- */
 router.put('/api/user', async (req, res) => {
-
+  // Überprüfen, ob die angegebene teamId in der Team Tabelle vorhanden ist
+  const team = await Team.findByPk(req.body.teamId);
+  if (!team) {
+    res.status(400).send('Ungültige teamId');
+    return;
+  }
+  console.log(req.body.teamId);
+  // Aktualisiere den User mit den angegebenen Werten
   User.update({
     vorname: req.body.vorname,
     nachname: req.body.nachname,
@@ -183,20 +205,20 @@ router.put('/api/user', async (req, res) => {
     restUrlaub: req.body.restUrlaub,
     gepUrlaubsTage: req.body.gepUrlaubsTage,
     genUrlaubsTage: req.body.genUrlaubsTage,
-    teamLeiterId: req.body.teamLeiterId
+    teamId: req.body.teamId
   },
-    { where: { userId: req.body.userId } }
-  ).then(() => {
-    console.log("User aktualisiert");
-    res.send();
-  })
+    { where: { userId: req.body.userId } })
+    .then(() => {
+      console.log("User aktualisiert");
+      res.send();
+    })
     .catch((error) => {
       console.error(error);
       res.send({ error });
     });
 });
 
-//Error mit mismatch auf Team
+//Error mit mismatch auf Team-----------------------Sollte Funktionieren
 
 /*---Mitarbeiter Löschen--- */
 router.delete('/api/user', (req, res) => {
@@ -281,7 +303,7 @@ router.post('/api/userTeam', async (req, res) => {
 
       })
       .catch((error) => {
-       // console.error(error);
+        // console.error(error);
         res.send({ error });
       });
 
@@ -296,9 +318,7 @@ router.post('/api/userTeam', async (req, res) => {
 
 /*---Team Löschen--- */
 router.delete('/api/userTeam', async (req, res) => {
-  
-  
-  
+  /*
   Team.findAll({
     where: {
       teamLeiterId: 1 // oder andere ID
@@ -306,14 +326,12 @@ router.delete('/api/userTeam', async (req, res) => {
   }).then(teams => {
     console.log(teams);
   });
- 
- 
- 
+ */
   const { teamLeiterId } = req.body;
   if (!teamLeiterId) {
     return res.status(400).send("Es wurde keine teamLeiterId übergeben.");
   }
-  
+
   try {
     const affectedRows = await User.update({ teamLeiterId: null }, { where: { teamLeiterId } });
     if (affectedRows > 0) {
