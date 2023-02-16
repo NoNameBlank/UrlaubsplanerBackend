@@ -261,25 +261,53 @@ router.get('/api/urlaubTeam', async (req, res) => {
 /* -------------------------------------------------------------------API/USERTEAM------------------------------------------------------------------------------------*/
 router.get('/api/userTeam', async (req, res) => {
   var teamLeiterId = req.body.teamLeiterId;
+  var teamId = req.body.teamId;
   var nameArray = [];
   var data = [];
 
-//Die Erweitern siehe ToDO liste
-  console.log("Anfrage auf TeamleiterID: " + teamLeiterId);
+  console.log("Anfrage auf TeamleiterID: " + teamId);
+  
   const userArray = await User.findAll({
-    where: { teamLeiterId: teamLeiterId },
-
+    where: { teamId: teamId },
   });
 
+  if (userArray) {
+    for (let i = 0; i < userArray.length; i++) {
+      const user = userArray[i];
+      const userData = user.dataValues;
+      userData.appointments = [];
 
-  userArray.forEach(user => {
-    data.push(user.dataValues);
-    console.log("Die namen der User aus deinem Team: ");
-    console.log(data);
-  })
-  res.send(data);
-  console.log(data);
+      const urlaub = await Urlaub.findAll({
+        where: { userId: userData.id }
+      });
+
+      if (urlaub && urlaub.length > 0) {
+        urlaub.forEach(element => {
+          delete element.dataValues.createdAt;
+          delete element.dataValues.updatedAt;
+          userData.appointments.push(element.dataValues);
+        });
+      }
+
+      delete userData.passwort;
+      data.push(userData);
+    }
+
+    res.send({ data });
+  } else {
+    res.status(404).send({ message: "Keine Benutzer gefunden" });
+  }
 });
+
+
+
+
+
+
+
+
+
+
 
 /*---Create Team in DB--- */
 router.post('/api/Team', async (req, res) => {
