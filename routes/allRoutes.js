@@ -39,7 +39,7 @@ router.get('/api/userDetail', async (req, res) => {
 /*---UserDaten im Dashboard Laden--- */
 router.get('/api/userById', async (req, res) => {
   try {
-    var userId = req.body.userId;
+    var userId = req.query.userId;
     console.log("Hier drunter sollte die ID stehebn:")
     console.log(userId);
     var user = await User.findByPk(userId);
@@ -73,8 +73,6 @@ router.get('/api/userById', async (req, res) => {
 /* -------------------------------------------------------------------API/URLAUB------------------------------------------------------------------------------------*/
 
 
-//Fehler Handling!!!!------------------Sollte gehen.
-
 /*---Gebuchter Urlaub wird vom Fontend an das Backend gesendet und in die Datenbank geschrieben--- */
 router.post('/api/urlaub', async (req, res) => {
   var data = req.body;
@@ -90,15 +88,30 @@ router.post('/api/urlaub', async (req, res) => {
   newUrlaub.save()
     .then(() => {
       // console.log('Urlaub wurde gespeichert.');
+      res.status(200).send();
+    })
+});
+
+router.put('/api/urlaub', async (req, res) => {
+  Urlaub.update({
+    urlaubId: req.body.urlaubId,
+    userId: req.body.userId,
+    startDatum: req.body.startDatum,
+    endDatum: req.body.endDatum,
+    titel: req.body.titel,
+    status: req.body.status
+  },
+    { where: { urlaubId: req.body.urlaubId } })
+    .then(() => {
+      console.log("Urlaub wurde aktualisiert");
       res.send();
     })
     .catch((error) => {
-      // console.error(error);
-      res.status(500).send({ error: "Es ist ein Fehler aufgetreten." });
+      console.error(error);
+      res.send({ error });
     });
 });
 
-//Fehler Handling!!!!
 //Funktioniert nicht--------------------------------------------------------------------------------------------SOOOOLLLLLLLLLLLLLLTTTEEEEEEEEEEE klappen^^
 
 /*---Ulaub Löschen--- */
@@ -233,70 +246,96 @@ router.delete('/api/user', (req, res) => {
 /* -------------------------------------------------------------------API/TEAMURLAUB------------------------------------------------------------------------------------*/
 
 router.get('/api/urlaubTeam', async (req, res) => {
-  var teamLeiterId = req.body.teamLeiterId;
+  var teamLeiterId = req.query.teamLeiterId;
   var userIdArray = [];
   var data = [];
+  var userArrayClean =  [];
   console.log("Anfrage auf TeamleiterID: " + teamLeiterId);
-  // JOIN-Abfrage, um alle Benutzer und Urlaube zu finden, die mit der übergebenen "teamLeiterId" verknüpft sind
-  const userArray = await User.findAll({
+  
+  const TeamObject = await Team.findAll({
     where: { teamLeiterId: teamLeiterId },
-  });
-  userArray.forEach(user => {
-    userIdArray.push(user.dataValues.userId);
   })
-  var urlaubsArray = await Urlaub.findAll({ where: { userId: userIdArray } });
-  if (urlaubsArray) {
-    urlaubsArray.forEach(urlaub => {
-      console.log(urlaub.dataValues);
-      data.push(urlaub.dataValues);
+  if(TeamObject){
+    // JOIN-Abfrage, um alle Benutzer und Urlaube zu finden, die mit der übergebenen "teamLeiterId" verknüpft sind
+    const userArray = await User.findAll({
+      where: { teamId: TeamObject[0].dataValues.teamId },
     });
-    res.send(data);
-  } else {
-    res.send("Fehler beim Laden der Urlaubsdaten");
+    userArray.forEach(user => {
+      userIdArray.push(user.dataValues.userId);
+      userArrayClean.push(user.dataValues)
+    })
+    console.log(userArrayClean);
+    var urlaubsArray = await Urlaub.findAll({ where: { userId: userIdArray } });
+    if (urlaubsArray) {
+      urlaubsArray.forEach(urlaub => {
+        var oEntry = userArrayClean.find(function (oEntry) {
+          return oEntry.userId === urlaub.dataValues.userId;
+        });
+        urlaub.dataValues.vorname = oEntry.vorname;
+        urlaub.dataValues.nachname = oEntry.nachname;
+        urlaub.dataValues.restUrlaub = oEntry.restUrlaub;
+        urlaub.dataValues.gepUrlaubsTage = oEntry.gepUrlaubsTage;
+        data.push(urlaub.dataValues);
+      });
+      res.send(data);
+    } else {
+      res.send("Fehler beim Laden der Urlaubsdaten");
+    }
+  }else{
+    res.status(404).send({ message: "Keine Team zur Teamleiter id gefunden" });
   }
-
 });
 
 
 /* -------------------------------------------------------------------API/USERTEAM------------------------------------------------------------------------------------*/
 router.get('/api/userTeam', async (req, res) => {
-  var teamLeiterId = req.body.teamLeiterId;
-  var teamId = req.body.teamId;
-  var nameArray = [];
+  console.log(req.query);
+  var teamLeiterId = req.query.teamLeiterId;
   var data = [];
 
-  console.log("Anfrage auf TeamleiterID: " + teamId);
+  console.log("Anfrage auf TeamleiterID: " + teamLeiterId);
   
-  const userArray = await User.findAll({
-    where: { teamId: teamId },
-  });
+  const TeamObject = await Team.findAll({
+    where: { teamLeiterId: teamLeiterId },
+  })
+  if(TeamObject[0]){
+    console.log(TeamObject);
 
-  if (userArray) {
-    for (let i = 0; i < userArray.length; i++) {
-      const user = userArray[i];
-      const userData = user.dataValues;
-      userData.appointments = [];
-
-      const urlaub = await Urlaub.findAll({
-        where: { userId: userData.id }
-      });
-
-      if (urlaub && urlaub.length > 0) {
-        urlaub.forEach(element => {
-          delete element.dataValues.createdAt;
-          delete element.dataValues.updatedAt;
-          userData.appointments.push(element.dataValues);
+    const userArray = await User.findAll({
+      where: { teamId: TeamObject[0].dataValues.teamId },
+    });
+  
+    if (userArray) {
+      for (let i = 0; i < userArray.length; i++) {
+        const user = userArray[i];
+        const userData = user.dataValues;
+        delete userData.createdAt;
+        delete userData.updatedAt;
+        userData.appointments = [];
+        const urlaub = await Urlaub.findAll({
+          where: { userId: userData.userId }
         });
+  
+        if (urlaub && urlaub.length > 0) {
+          urlaub.forEach(element => {
+            delete element.dataValues.createdAt;
+            delete element.dataValues.updatedAt;
+            userData.appointments.push(element.dataValues);
+          });
+        }
+  
+        delete userData.passwort;
+        data.push(userData);
       }
-
-      delete userData.passwort;
-      data.push(userData);
+  
+      res.send({ data });
+    } else {
+      res.status(404).send({ message: "Keine Benutzer gefunden" });
     }
-
-    res.send({ data });
-  } else {
-    res.status(404).send({ message: "Keine Benutzer gefunden" });
+  }else{
+    res.status(404).send({ message: "Keine Team zur Teamleiter id gefunden" });
   }
+ 
 });
 
 

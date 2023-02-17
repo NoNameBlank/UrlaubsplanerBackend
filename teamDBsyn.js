@@ -32,21 +32,14 @@ const Team = sequelize.define('Team', {
     autoIncrement: true
   },
   teamLeiterId: {
-    type: Sequelize.INTEGER,
-    // references: {
-    //   model: 'User',
-    //   key: 'userId'
-    // }
+    type: Sequelize.INTEGER
   },
   teamName: {
-    type: Sequelize.INTEGER,
-   
+    type: Sequelize.INTEGER
   }
 },{
   tableName: "Team"
 });
-// Team.hasMany(User, { foreignKey: 'teamLeiterId' });
-// User.belongsTo(Team, { foreignKey: 'teamLeiterId' });
 
 module.exports = Team;
 
